@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confiserie Bachmann – Wir schenken Menschen täglich einen Genussmoment</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Amaranth:wght@700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bachmann-blue: #0052C5;
+            --bachmann-beige: #F5F3F0;
+            --bachmann-brown: #351A00;
+            --bachmann-gold: #B99557;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+            color: var(--bachmann-brown);
+            background-color: white;
+        }
+
+        h1, h2, h3, .brand-font {
+            font-family: 'Amaranth', sans-serif;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .page-content {
+            display: none;
+        }
+        .page-content.active {
+            display: block;
+        }
+
+        /* Navigation: Von Anfang an präsent */
+        .nav-visible {
+            background-color: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-card:hover .product-overlay {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .filter-btn.active {
+            background-color: var(--bachmann-brown);
+            color: white;
+            border-color: var(--bachmann-brown);
+        }
+
+        /* Timeline Styles */
+        .timeline {
+            display: flex;
+            overflow-x: auto;
+            padding-bottom: 30px;
+            gap: 50px;
+            scrollbar-width: none;
+        }
+        .timeline::-webkit-scrollbar { display: none; }
+        
+        .timeline-item {
+            min-width: 260px;
+            position: relative;
+        }
+
+        .timeline-dot {
+            width: 14px;
+            height: 14px;
+            background: var(--bachmann-blue);
+            border-radius: 50%;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .timeline-dot::after {
+            content: '';
+            position: absolute;
+            top: 6px;
+            left: 14px;
+            width: calc(100% + 50px);
+            height: 1px;
+            background: rgba(0, 82, 197, 0.2);
+        }
+        .timeline-item:last-child .timeline-dot::after { display: none; }
+
+        /* Agons Team Styles */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2px;
+            background-color: rgba(0, 82, 197, 0.05); /* Dezente Trennlinien */
+        }
+        
+        .team-card {
+            background: var(--bachmann-beige);
+            overflow: hidden;
+            transition: all 0.4s ease;
+        }
+        
+        .team-card-img-wrap {
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .team-card-img-wrap::after {
+            content: "";
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 50%;
+            background: linear-gradient(transparent, rgba(0,82,197,0.10));
+            pointer-events: none;
+        }
+        
+        .team-card-img {
+            width: 100%;
+            aspect-ratio: 3/4;
+            object-fit: cover;
+            object-position: top;
+            display: block;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .team-card:hover .team-card-img {
+            transform: scale(1.05);
+        }
+        
+        .team-card-info {
+            padding: 32px 24px 40px;
+            border-top: 3px solid var(--bachmann-blue);
+            background: white;
+        }
+        
+        .team-card-role {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--bachmann-gold);
+            margin-bottom: 8px;
+        }
+        
+        .team-card-name {
+            font-family: "Amaranth", sans-serif;
+            font-weight: 700;
+            font-size: 28px;
+            text-transform: uppercase;
+            line-height: 1;
+            letter-spacing: -0.5px;
+            color: var(--bachmann-blue);
+        }
+
+        @media (max-width: 768px) {
+            .team-grid { grid-template-columns: 1fr; gap: 20px; background: none; }
+        }
+
+        /* Scroll Reveal Animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVIGATION -->
+    <nav id="navbar" class="fixed w-full z-50 transition-all duration-500 py-3 nav-visible">
+        <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
+            
+            <!-- Logo Oben Links -->
+            <div class="flex items-center group cursor-pointer" onclick="showPage('home')">
+                <img src="assets/Element 7@3x.png" alt="Bachmann Logo" class="h-16 md:h-20 w-auto transition-transform duration-500 group-hover:scale-105">
+            </div>
+
+            <!-- Menü Rechts -->
+            <div class="hidden md:flex items-center space-x-10 font-medium uppercase text-xs tracking-[0.2em]">
+                <button onclick="showPage('home')" class="hover:text-[#0052C5] transition-colors nav-link py-2" data-page="home">Start</button>
+                <button onclick="showPage('products')" class="hover:text-[#0052C5] transition-colors nav-link py-2" data-page="products">Produkte</button>
+                <button onclick="showPage('about')" class="hover:text-[#0052C5] transition-colors nav-link py-2" data-page="about">Über Uns</button>
+                <button class="relative group ml-4 p-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:text-[#0052C5] transition-colors"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+                    <span id="cart-count" class="absolute -top-1 -right-1 bg-[#0052C5] text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold">0</span>
+                </button>
+            </div>
+
+            <!-- Mobile Menü Button -->
+            <button class="md:hidden p-2" onclick="toggleMobileMenu()">
+                <svg id="menu-icon" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+            </button>
+        </div>
+
+        <div id="mobile-menu" class="hidden absolute top-full left-0 w-full bg-white shadow-2xl py-12 flex flex-col items-center space-y-8 text-lg uppercase tracking-widest font-medium">
+            <button onclick="showPage('home'); toggleMobileMenu()">Start</button>
+            <button onclick="showPage('products'); toggleMobileMenu()">Produkte</button>
+            <button onclick="showPage('about'); toggleMobileMenu()">Über Uns</button>
+        </div>
+    </nav>
+
+    <!-- INHALT -->
+    <main>
+        
+        <!-- STARTSEITE -->
+        <div id="page-home" class="page-content active fade-in">
+            <section class="relative h-screen flex items-center justify-center overflow-hidden">
+                <div class="absolute inset-0 z-0">
+                    <div class="w-full h-full bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&q=80&w=2000'); filter: brightness(0.5);"></div>
+                </div>
+                <div class="relative z-10 text-center px-6 mt-20">
+                    <span class="text-white/80 uppercase tracking-[0.4em] text-xs mb-6 block font-semibold">Luzerner Confiserie seit 1897</span>
+                    <h1 class="text-5xl md:text-8xl mb-8 text-white leading-[1.1]">Tradition, die man <br class="hidden md:block"> händisch formt.</h1>
+                    <p class="text-lg md:text-xl text-white mb-12 opacity-90 max-w-2xl mx-auto font-light italic leading-relaxed">
+                        "Echtes Handwerk braucht Zeit, Mehl und Leidenschaft. <br>Wir schenken Ihnen täglich diesen einen Genussmoment."
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                        <button onclick="showPage('products')" class="px-12 py-5 bg-[#0052C5] text-white uppercase tracking-widest text-xs font-bold rounded-full hover:bg-white hover:text-[#0052C5] transition-all hover:scale-105 shadow-2xl">
+                            Sortiment entdecken
+                        </button>
+                        <button onclick="showPage('about')" class="px-12 py-5 bg-transparent border-2 border-white text-white uppercase tracking-widest text-xs font-bold rounded-full hover:bg-white hover:text-[#351A00] transition-all">
+                            Unsere Geschichte
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="py-32 px-6 bg-[#F5F3F0]">
+                <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-20">
+                    <div class="text-center group reveal">
+                        <div class="w-20 h-20 rounded-2xl bg-white flex items-center justify-center shadow-xl mx-auto mb-8 transform transition-transform group-hover:rotate-6">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#0052C5" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        </div>
+                        <h3 class="text-2xl mb-4 text-[#351A00]">Höchste Qualität</h3>
+                        <p class="text-gray-500 text-sm leading-relaxed">Auserlesene Rohstoffe und traditionelle Rezepturen garantieren unverfälschten Genuss.</p>
+                    </div>
+                    <div class="text-center group reveal">
+                        <div class="w-20 h-20 rounded-2xl bg-white flex items-center justify-center shadow-xl mx-auto mb-8 transform transition-transform group-hover:-rotate-6">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#0052C5" stroke-width="1.5"><path d="M20.42 4.58a5.4 5.4 0 0 0-7.65 0l-.77.78-.77-.78a5.4 5.4 0 0 0-7.65 0C1.46 6.7 1.33 10.28 4 13l8 8 8-8c2.67-2.72 2.54-6.3.42-8.42z"/></svg>
+                        </div>
+                        <h3 class="text-2xl mb-4 text-[#351A00]">Viel Herzblut</h3>
+                        <p class="text-gray-500 text-sm leading-relaxed">Jedes Produkt wird von unseren Confiseuren mit Liebe zum Detail von Hand gefertigt.</p>
+                    </div>
+                    <div class="text-center group reveal">
+                        <div class="w-20 h-20 rounded-2xl bg-white flex items-center justify-center shadow-xl mx-auto mb-8 transform transition-transform group-hover:rotate-6">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#0052C5" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        </div>
+                        <h3 class="text-2xl mb-4 text-[#351A00]">Luzerner Wurzeln</h3>
+                        <p class="text-gray-500 text-sm leading-relaxed">Wir sind stolz auf unsere Herkunft und backen täglich frisch für die Zentralschweiz.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- PRODUKTE SEITE -->
+        <div id="page-products" class="page-content fade-in pt-48 pb-32 px-6 bg-[#F5F3F0]">
+            <div class="max-w-7xl mx-auto">
+                <header class="mb-16 text-center reveal">
+                    <span class="text-[#B99557] font-bold uppercase tracking-widest text-xs mb-4 block">Handverlesen</span>
+                    <h1 class="text-5xl md:text-6xl mb-6 text-[#351A00]">Süsses Sortiment</h1>
+                    <div class="w-20 h-1 bg-[#0052C5] mx-auto"></div>
+                </header>
+
+                <div class="flex flex-wrap justify-center gap-3 mb-20 reveal">
+                    <button onclick="filterProducts('all')" class="filter-btn active px-8 py-3 rounded-full border border-gray-200 bg-white text-sm font-bold transition-all shadow-sm">Alle</button>
+                    <button onclick="filterProducts('pralines')" class="filter-btn px-8 py-3 rounded-full border border-gray-200 bg-white text-sm font-bold transition-all shadow-sm hover:border-[#0052C5]">Pralinés & Truffes</button>
+                    <button onclick="filterProducts('cakes')" class="filter-btn px-8 py-3 rounded-full border border-gray-200 bg-white text-sm font-bold transition-all shadow-sm hover:border-[#0052C5]">Torten</button>
+                    <button onclick="filterProducts('specialty')" class="filter-btn px-8 py-3 rounded-full border border-gray-200 bg-white text-sm font-bold transition-all shadow-sm hover:border-[#0052C5]">Spezialitäten</button>
+                    <button onclick="filterProducts('pastry')" class="filter-btn px-8 py-3 rounded-full border border-gray-200 bg-white text-sm font-bold transition-all shadow-sm hover:border-[#0052C5]">Gebäck</button>
+                </div>
+
+                <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10"></div>
+            </div>
+        </div>
+
+        <!-- ÜBER UNS SEITE -->
+        <div id="page-about" class="page-content fade-in pt-48 pb-32">
+            
+            <section class="max-w-7xl mx-auto px-6 mb-24 text-center">
+                <div class="reveal">
+                    <span class="text-[#0052C5] font-bold uppercase tracking-widest text-xs mb-4 block">Unsere Werte</span>
+                    <h1 class="text-5xl md:text-8xl mb-12 text-[#351A00]">Tradition & <br>Handwerk</h1>
+                    
+                    <!-- Logo Animation GIF -->
+                    <div class="inline-block p-2 md:p-12 bg-[#F5F3F0] rounded-[3.5rem] shadow-inner mb-20 w-full max-w-5xl">
+                        <img src="assets/Logoanimation.gif" alt="Bachmann Logo Animation" class="w-full h-auto rounded-3xl mx-auto shadow-2xl" onerror="this.src='Blue and White Modern Bold Croissant Instagram Post (1).png'">
+                    </div>
+                </div>
+
+                <div class="max-w-4xl mx-auto text-left space-y-10 reveal">
+                    <p class="text-3xl leading-relaxed text-gray-700 font-light">
+                        Seit 1891 steht Bachmann Confiserie für die hohe Kunst des Schweizer Handwerks. Was als Familienbäckerei begann, ist heute ein Symbol für Qualität in Luzern.
+                    </p>
+                </div>
+            </section>
+
+            <!-- STATS -->
+            <section class="bg-[#F5F3F0] py-28 px-6 mb-32">
+                <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
+                    <div class="bg-white p-12 rounded-[2rem] text-center shadow-sm reveal">
+                        <div class="text-6xl font-bold text-[#0052C5] mb-2">133</div>
+                        <div class="text-[11px] uppercase tracking-widest text-gray-400 font-bold">Jahre Erfahrung</div>
+                    </div>
+                    <div class="bg-white p-12 rounded-[2rem] text-center shadow-sm reveal" style="transition-delay: 150ms">
+                        <div class="text-6xl font-bold text-[#0052C5] mb-2">20</div>
+                        <div class="text-[11px] uppercase tracking-widest text-gray-400 font-bold">Standorte</div>
+                    </div>
+                    <div class="bg-white p-12 rounded-[2rem] text-center shadow-sm reveal" style="transition-delay: 300ms">
+                        <div class="text-6xl font-bold text-[#0052C5] mb-2">500+</div>
+                        <div class="text-[11px] uppercase tracking-widest text-gray-400 font-bold">Talente</div>
+                    </div>
+                    <div class="bg-white p-12 rounded-[2rem] text-center shadow-sm reveal" style="transition-delay: 450ms">
+                        <div class="text-6xl font-bold text-[#0052C5] mb-2">∞</div>
+                        <div class="text-[11px] uppercase tracking-widest text-gray-400 font-bold">Genussmomente</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TIMELINE -->
+            <section class="max-w-7xl mx-auto px-6 mb-32">
+                <div class="reveal mb-20">
+                    <span class="text-[#B99557] font-bold uppercase tracking-widest text-xs mb-4 block">Meilensteine</span>
+                    <h2 class="text-4xl md:text-5xl text-[#351A00]">Unsere Geschichte</h2>
+                </div>
+                
+                <div class="timeline reveal">
+                    <div class="timeline-item">
+                        <div class="text-5xl font-bold text-[#0052C5] brand-font">1891</div>
+                        <div class="timeline-dot"></div>
+                        <h4 class="text-lg font-bold mb-2">Gründung</h4>
+                        <p class="text-sm text-gray-500 leading-relaxed">Eröffnung der ersten Backstube in der malerischen Luzerner Altstadt.</p>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="text-5xl font-bold text-[#0052C5] brand-font">1965</div>
+                        <div class="timeline-dot"></div>
+                        <h4 class="text-lg font-bold mb-2">Der Wasserturm</h4>
+                        <p class="text-sm text-gray-500 leading-relaxed">Der Luzerner Wasserturm wird zum ikonischen Kern unseres Markenzeichens.</p>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="text-5xl font-bold text-[#0052C5] brand-font">1998</div>
+                        <div class="timeline-dot"></div>
+                        <h4 class="text-lg font-bold mb-2">Go Digital</h4>
+                        <p class="text-sm text-gray-500 leading-relaxed">Als Pionier starten wir einen der ersten Online-Shops der Branche.</p>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="text-5xl font-bold text-[#0052C5] brand-font">2024</div>
+                        <div class="timeline-dot"></div>
+                        <h4 class="text-lg font-bold mb-2">Neuer Auftritt</h4>
+                        <p class="text-sm text-gray-500 leading-relaxed">Einführung des modernen Corporate Designs.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TEAM SEKTION -->
+            <section class="max-w-7xl mx-auto px-6 mb-32">
+                <div class="reveal mb-16">
+                    <span class="text-[#B99557] font-bold uppercase tracking-widest text-xs mb-4 block">Unser Team</span>
+                    <h2 class="text-5xl md:text-7xl text-[#351A00] uppercase font-bold brand-font leading-[0.92] tracking-[-2px] mb-20">Menschen<br>hinter dem<br>Genuss</h2>
+                    
+                    <div class="team-grid">
+                        <div class="team-card reveal">
+                            <div class="team-card-img-wrap">
+                                <img class="team-card-img" src="assets/Aurel Bachmann.jpg" alt="Aurel Bachmann">
+                            </div>
+                            <div class="team-card-info">
+                                <div class="team-card-role">CEO</div>
+                                <div class="team-card-name">Aurel Bachmann</div>
+                            </div>
+                        </div>
+                        <div class="team-card reveal" style="transition-delay: 150ms">
+                            <div class="team-card-img-wrap">
+                                <img class="team-card-img" src="assets/Jennifer Autiero.jpg" alt="Jennifer Autiero">
+                            </div>
+                            <div class="team-card-info">
+                                <div class="team-card-role">Leiterin Produktion</div>
+                                <div class="team-card-name">Jennifer Autiero</div>
+                            </div>
+                        </div>
+                        <div class="team-card reveal" style="transition-delay: 300ms">
+                            <div class="team-card-img-wrap">
+                                <img class="team-card-img" src="assets/Flurin Kraushaar.jpg" alt="Flurin Kraushaar">
+                            </div>
+                            <div class="team-card-info">
+                                <div class="team-card-role">Chefkonditor</div>
+                                <div class="team-card-name">Flurin Kraushaar</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="py-20 px-6 bg-[#351A00] text-white text-center">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex justify-center mb-10">
+                <img src="assets/Element 7@3x.png" alt="Bachmann Logo" class="h-16 w-auto brightness-0 invert">
+            </div>
+            
+            <!-- Vereinfachte Navigation im Footer -->
+            <div class="flex flex-wrap justify-center gap-10 mb-12 font-medium uppercase text-xs tracking-[0.2em]">
+                <button onclick="showPage('home')" class="hover:text-[#B99557] transition-colors">Start</button>
+                <button onclick="showPage('products')" class="hover:text-[#B99557] transition-colors">Produkte</button>
+                <button onclick="showPage('about')" class="hover:text-[#B99557] transition-colors">Über Uns</button>
+            </div>
+
+            <div class="pt-10 border-t border-white/5 opacity-40 text-[10px] uppercase tracking-[0.3em]">
+                <span>© 2026 Confiserie Bachmann AG | Luzern</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- SCRIPTS -->
+    <script>
+        const products = [
+            { id: 1, category: 'pralines', name: 'Gemischte Pralinés (20er)', price: '29.80', img: 'https://images.unsplash.com/photo-1548907040-4baa42d10919?auto=format&fit=crop&q=80&w=400' },
+            { id: 2, category: 'cakes', name: 'Erdbeer-Joghurttorte (6 P.)', price: '48.00', img: 'https://images.unsplash.com/photo-1565958011703-44f9829ba187?auto=format&fit=crop&q=80&w=400' },
+            { id: 3, category: 'specialty', name: 'Luzerner Wasserturm-Steine®', price: '22.50', img: 'https://images.unsplash.com/photo-1549007994-cb92caebd54b?auto=format&fit=crop&q=80&w=400' },
+            { id: 4, category: 'pastry', name: 'Schutzli (12er Pack)', price: '18.50', img: 'https://images.unsplash.com/photo-1558961363-fa8fdf82db35?auto=format&fit=crop&q=80&w=400' },
+            { id: 5, category: 'pralines', name: 'Champagner Truffes', price: '34.00', img: 'https://images.unsplash.com/photo-1526081347589-7fa3cb41b4b2?auto=format&fit=crop&q=80&w=400' },
+            { id: 6, category: 'cakes', name: 'Truffes-Torte (4 P.)', price: '38.00', img: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&q=80&w=600' },
+            { id: 7, category: 'specialty', name: 'Luzerner Schoggitürmli', price: '12.80', img: 'https://images.unsplash.com/photo-1481391319762-47dff72954d9?auto=format&fit=crop&q=80&w=400' },
+            { id: 9, category: 'pralines', name: 'Praliné Herz-Präsent', price: '42.00', img: 'https://images.unsplash.com/photo-1511381939415-e44015466834?auto=format&fit=crop&q=80&w=400' },
+            { id: 10, category: 'pastry', name: 'Amaretti Box', price: '15.50', img: 'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?auto=format&fit=crop&q=80&w=400' }
+        ];
+
+        let cartCount = 0;
+
+        function renderProducts(filter = 'all') {
+            const grid = document.getElementById('product-grid');
+            grid.innerHTML = '';
+            const filtered = filter === 'all' ? products : products.filter(p => p.category === filter);
+            
+            filtered.forEach(p => {
+                grid.innerHTML += `
+                    <div class="product-card bg-white rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-700 group reveal">
+                        <div class="h-72 overflow-hidden relative">
+                            <img src="${p.img}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[1.5s]">
+                            <div class="product-overlay absolute inset-0 bg-black/30 opacity-0 transform translate-y-8 transition-all duration-500 flex items-center justify-center">
+                                <button onclick="addToCart()" class="bg-white text-[#351A00] px-8 py-3 rounded-full font-bold text-xs uppercase tracking-widest shadow-2xl hover:bg-[#0052C5] hover:text-white transition-all transform hover:scale-105 active:scale-95">Bestellen</button>
+                            </div>
+                        </div>
+                        <div class="p-8">
+                            <div class="flex justify-between items-start mb-2">
+                                <span class="text-[9px] uppercase tracking-widest text-[#B99557] font-bold">${getCategoryName(p.category)}</span>
+                                <div class="flex text-[#B99557] gap-0.5">${Array(5).fill('<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>').join('')}</div>
+                            </div>
+                            <h3 class="font-bold text-lg mb-4 leading-tight h-14 group-hover:text-[#0052C5] transition-colors">${p.name}</h3>
+                            <div class="pt-4 border-t border-gray-50 flex justify-between items-center">
+                                <span class="text-xl font-bold">CHF ${p.price}</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="opacity-10 group-hover:opacity-100 group-hover:translate-x-2 transition-all"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            reinitObserver();
+        }
+
+        function getCategoryName(cat) {
+            const names = { pralines: 'Pralinés', cakes: 'Torten', specialty: 'Spezialität', pastry: 'Backstube' };
+            return names[cat] || cat;
+        }
+
+        function filterProducts(cat) {
+            renderProducts(cat);
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function addToCart() {
+            cartCount++;
+            document.getElementById('cart-count').innerText = cartCount;
+        }
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
+            document.getElementById('page-' + pageId).classList.add('active');
+            document.querySelectorAll('.nav-link').forEach(link => {
+                if (link.getAttribute('data-page') === pageId) {
+                    link.classList.add('border-b-2', 'border-[#0052C5]', 'text-[#0052C5]');
+                } else {
+                    link.classList.remove('border-b-2', 'border-[#0052C5]', 'text-[#0052C5]');
+                }
+            });
+            window.scrollTo(0, 0);
+            reinitObserver();
+        }
+
+        function toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        }
+
+        let observer;
+        function initObserver() {
+            observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.08 });
+            
+            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        }
+
+        function reinitObserver() {
+            if (observer) observer.disconnect();
+            initObserver();
+        }
+
+        renderProducts();
+        showPage('home');
+        initObserver();
+    </script>
+</body>
+</html>
